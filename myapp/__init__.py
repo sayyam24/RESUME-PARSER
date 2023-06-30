@@ -1,6 +1,7 @@
 from flask import Flask
 # from api.main import main
 from .api.users import users
+from .api.main import main
 from flask_smorest import Api
 
 # from pymongo import MongoClient
@@ -18,10 +19,10 @@ config_object='myapp.settings'
 app = Flask(__name__)
 
 app.config.from_object(config_object)
-
+app.debug = True
 api = Api(app)
 api.register_blueprint(users)
-
+api.register_blueprint(main)
 
 # app.register_blueprint(main)
 # app.config["SECRET_KEY"] = SECRET_KEY

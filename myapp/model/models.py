@@ -5,21 +5,29 @@ connect('sip')
 
 # Access specifier for a user
 class User_type(Document):
-    _id = IntField(primary_key=True)
+    _id = StringField(primary_key=True)
     type = StringField()
 
 class User(Document):
-    _id = IntField(primary_key=True)
-    firstname = StringField()
-    lastname = StringField()
+    _id = StringField(primary_key=True)
+    first_name = StringField()
+    last_name = StringField()
     age = IntField()
     gender = StringField()
     mobile = StringField()
     email = StringField()
+    # Password for authentication
+    password = StringField()
     passport = StringField()
     aadhar = StringField()
     pancard = StringField()
-    accesslevel = IntField()    # Referencing User_type class
+    access_level = IntField()    # Referencing User_type class
+    # Creation info
+    created_at = DateTimeField()
+    created_by = StringField()
+    updated_at = DateTimeField()
+    updated_by = StringField()
+    is_deleted = IntField()
 
     @classmethod
     def get_user(cls, id):
@@ -34,24 +42,40 @@ class User(Document):
 
 
 class Candidate(Document):
-    _id = IntField(primary_key=True)
+    _id = StringField(primary_key=True)
     user = StringField()
     resume = IntField()         # Referencing resume class
+    # Creation info
+    created_at = DateTimeField()
+    created_by = StringField()
+    updated_at = DateTimeField()
+    updated_by = StringField()
+    is_deleted = IntField()
 
 
 class Manager(Document):
-    _id = IntField(primary_key=True)
+    _id = StringField(primary_key=True)
     user = StringField()
     designation = StringField()
-
+    # Creation info
+    created_at = DateTimeField()
+    created_by = StringField()
+    updated_at = DateTimeField()
+    updated_by = StringField()
+    is_deleted = IntField()
 
 class admin(Document):
-    _id = IntField(primary_key=True)
+    _id = StringField(primary_key=True)
     user = StringField()
-
+    # Creation info
+    created_at = DateTimeField()
+    created_by = StringField()
+    updated_at = DateTimeField()
+    updated_by = StringField()
+    is_deleted = IntField()
 
 class Resume(Document):
-    _id = IntField(primary_key=True)
+    _id = StringField(primary_key=True)
     user = IntField()           # Referencing User class
     profile = StringField()
     education = ListField(StringField())
@@ -67,9 +91,15 @@ class Resume(Document):
     socialwork = ListField(StringField())
     extra = ListField(StringField())
     job = StringField()
-
+    # Creation info
+    created_at = DateTimeField()
+    created_by = StringField()
+    updated_at = DateTimeField()
+    updated_by = StringField()
+    is_deleted = IntField()
 
 class Job(Document):
+    _id = StringField(primary_key=True)
     title = StringField()
     recruiter = StringField()
     description = StringField()
@@ -80,4 +110,9 @@ class Job(Document):
     experience = ListField(StringField())
     language = ListField(StringField())
     extra = ListField(StringField())
-
+    # Creation info
+    created_at = DateTimeField()
+    created_by = StringField()
+    updated_at = DateTimeField()
+    updated_by = StringField()
+    is_deleted = IntField()

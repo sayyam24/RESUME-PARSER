@@ -1,7 +1,11 @@
-from flask import Blueprint
+from flask.views import MethodView
+from flask_smorest import Blueprint
+from myapp.response import APIResponse
 
-main = Blueprint('main', __name__)
 
-@main.route('/', methods=['GET', 'POST'])
-def index():
-    return "<h1> Hello world </h1>"
+main = Blueprint("main", __name__, description="main Operations")
+
+@main.route('/main')
+class Main(MethodView):
+    def get(self):
+        return APIResponse.respond("", "Working", 200)
