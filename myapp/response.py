@@ -1,12 +1,24 @@
-from flask import jsonify
+from flask import jsonify, make_response
 
 class APIResponse:
-
     @staticmethod
     def respond(data, message, status_code=200):
-        # prepared_data = APIResponse.prepare_response(data)
+        # processed_data = {}
+        # if data is not None:
+        #     if isinstance(data, dict):
+        #         item_id = str(data.pop('_id'))
+        #         processed_data[item_id] = data
+        #     else:
+        #         for item in data:
+        #             item_id = str(item.pop('_id'))
+        #             processed_data[item_id] = item
+        
         response = {
             'data': data,
-            'message': message
+            'message': message,
+            'status': status_code
         }
-        return jsonify(response), status_code
+        response = make_response(jsonify(response))
+        # response.headers['Content-Type'] = 'application/json'
+        return response
+

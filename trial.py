@@ -1,59 +1,33 @@
-from flask import Flask
-# from flask_pymongo import PyMongo
-from pymongo import MongoClient
-from pymongo.errors import ConnectionFailure
-from dotenv import load_dotenv, find_dotenv
-import os
-from myapp.model.models import *
+from uuid import uuid4
+from datetime import datetime
+from myapp.model.models import User
 
-# load_dotenv(find_dotenv())
-# SECRET_KEY = os.environ.get("SECRET_KEY")
-# CONNECTION_URI = os.environ.get("MONGO_URL")
+# Generate dummy user data
+dummy_users = []
+for i in range(10):
+    user_data = {
+        "_id": uuid4().hex,
+        "first_name": f"First Name {i+1}",
+        "last_name": f"Last Name {i+1}",
+        "age": 25 + i,
+        "gender": "Male" if i % 2 == 0 else "Female",
+        "mobile": f"123456789{i+1}",
+        "email": f"user{i+1}@example.com",
+        "passport": f"PASS{i+1}",
+        "aadhar": f"AADHAR{i+1}",
+        "pancard": f"PAN{i+1}",
+        "access_level": 1,
+        "created_at": datetime.now(),
+        "created_by": "Admin",
+        "updated_at": datetime.now(),
+        "updated_by": "Admin",
+        "is_deleted": 0
+    }
+    dummy_users.append(user_data)
 
-# app = Flask(__name__)
-# app.config["SECRET_KEY"] = SECRET_KEY
-
-# Setup MongoDB
-# client = MongoClient(CONNECTION_URI)
-# dbs = client.list_database_names()
-# sip_db = client.sip
-# collections = sip_db.list_collection_names()
-# print(collections)
-for i in range(1,10):
-    user = User(_id= i,firstname=f"Name {i}").save()
-# print(user.firstname)
-
-
-# try:
-#     # Attempt to connect to MongoDB
-#     mongo.init_app(app)
-#     db = mongo.db
-#     print("Connected to MongoDB successfully!")
-# except ConnectionFailure as e:
-#     print("Error connecting to MongoDB:", str(e))
-#
-#
-# @app.route("/")
-# def index():
-#     return "Hello World"
-#
-#
-# @app.route("/check-connection")
-# def check_connection():
-#     if db is None:
-#         return "Connection to MongoDB failed!"
-#
-#     collection = db.SIP
-#
-#     # Fetch all documents from the collection
-#     documents = collection.find()
-#
-#     # Print the data of each document
-#     for document in documents:
-#         print(document)
-#
-#     return "Connection to MongoDB successful!"
-
-
-# if __name__ == "__main__":
-#     app.run(debug=True)
+# Insert dummy users into the User collection
+for user_data in dummy_users:
+    user = User(**user_data)
+    user.save()
+# user = User.get_user("ef6112eae91345b4865203d2fe541912")
+# print(user.to_mongo().to_dict())
