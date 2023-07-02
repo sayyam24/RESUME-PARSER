@@ -31,6 +31,7 @@ class User(Document):
 
     @classmethod
     def get_user(cls, id):
+        
         # Fetch the user based on the query
         user = cls.objects(_id = id).first()
         return user
@@ -109,6 +110,7 @@ class Job(Document):
     skill = ListField(StringField())
     experience = ListField(StringField())
     language = ListField(StringField())
+    
     extra = ListField(StringField())
     # Creation info
     created_at = DateTimeField()
