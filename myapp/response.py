@@ -1,5 +1,5 @@
 from flask import jsonify, make_response
-
+import json
 class APIResponse:
     @staticmethod
     def respond(data, message, status_code=200):
@@ -14,11 +14,12 @@ class APIResponse:
         #             processed_data[item_id] = item
         
         response = {
-            'data': data,
+            'status': status_code,
             'message': message,
-            'status': status_code
+            'data': data
         }
-        response = make_response(jsonify(response))
-        # response.headers['Content-Type'] = 'application/json'
+        
+        response = make_response(json.dumps(response))
+        response.headers['Content-Type'] = 'application/json'
         return response
 

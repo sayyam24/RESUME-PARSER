@@ -1,17 +1,36 @@
-from marshmallow import Schema, fields
+from marshmallow import Schema, fields, RAISE
 
 class UserSchema(Schema):
-    id = fields.Int()
-    first_name = fields.Str(required=True)
-    last_name = fields.Str(required=True)
+    class Meta:
+        unknown = RAISE
+
+    _id = fields.Str()
+    username = fields.Str()
+    password = fields.Str()
+    first_name = fields.Str()
+    last_name = fields.Str()
     age = fields.Int()
     gender = fields.Str()
     mobile = fields.Str()
-    email = fields.Str(required=True)
+    email = fields.Str()
     passport = fields.Str()
     aadhar = fields.Str()
     pancard = fields.Str()
     access_level = fields.Int()
+
+    # " _id" : "Demo value",
+    # "username" : "Demo value",
+    # "password" : "Demo value",
+    # "first_name" : "Demo value",
+    # "last_name" : "Demo value",
+    # "age" : 15,
+    # "gender" : "Demo value",
+    # "mobile" : "Demo value",
+    # "email" : "Demo value",
+    # "passport" : "Demo value",
+    # "aadhar" : "Demo value",
+    # "pancard" : "Demo value",
+    # "access_level" : 15
 
 class UserPut(Schema):
     id = fields.Str(required=True)
