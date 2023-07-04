@@ -10,6 +10,8 @@ class User_type(Document):
 
 class User(Document):
     _id = StringField(primary_key=True)
+    username = StringField()
+    password = StringField()
     first_name = StringField()
     last_name = StringField()
     age = IntField()
@@ -30,10 +32,18 @@ class User(Document):
     is_deleted = IntField()
 
     @classmethod
-    def get_user(cls, id):
-        # Fetch the user based on the query
-        user = cls.objects(_id = id).first()
+    def get_user(cls, id=None, **kwargs):
+        query = {}
+
+        if id is not None:
+            query['_id'] = id
+
+        for field_name, value in kwargs.items():
+            query[field_name] = value
+
+        user = cls.objects(**query).first()
         return user
+
     
     @classmethod
     def get_users(cls):
