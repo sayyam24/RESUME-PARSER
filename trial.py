@@ -26,8 +26,20 @@ for i in range(10):
     dummy_users.append(user_data)
 
 # Insert dummy users into the User collection
-for user_data in dummy_users:
-    user = User(**user_data)
-    user.save()
+# for user_data in dummy_users:
+#     user = User(**user_data)
+#     user.save()
+user = User.get_user(field_name="first_name", value="Vaishnavi")
+
+if user:
+    print("User ID:", user.id)
+    print("First Name:", user.first_name)
+    print("Last Name:", user.last_name)
+    print("Age:", user.age)
+    # Print other attributes as needed
+else:
+    print("User not found")
+
+
 # user = User.get_user("ef6112eae91345b4865203d2fe541912")
 # print(user.to_mongo().to_dict())

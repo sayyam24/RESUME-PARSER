@@ -30,9 +30,15 @@ class User(Document):
     is_deleted = IntField()
 
     @classmethod
-    def get_user(cls, id):
-        # Fetch the user based on the query
-        user = cls.objects(_id = id).first()
+    def get_user(cls, id=None, field_name=None, value=None):
+        query = {}
+
+        if field_name is not None:
+            query[field_name] = value
+        else:
+            query['_id'] = id
+
+        user = cls.objects(**query).first()
         return user
     
     @classmethod
