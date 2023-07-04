@@ -95,6 +95,16 @@ class Users(MethodView):
         return APIResponse.respond(response_data, message, status_code)
 
 
+    @users.arguments(UserSchema)
+    def delete(self, request_data):
+        response_data = []
 
-    def delete(self):
-        pass
+        if 'username' not in request_data:
+            return APIResponse.respond(None, "Please provide username!", 400) 
+
+        username = request_data.pop('username')
+        deleted = User.objects(username=username).delete()
+        if deleted > 0:
+            return APIResponse.respond(None, "User deleted successfully!", 200)
+        else:
+            return APIResponse.respond(None, "Resource not found!", 404)
