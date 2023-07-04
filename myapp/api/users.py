@@ -9,23 +9,13 @@ from datetime import datetime
 
 users = Blueprint("users", __name__, description="User Operations")
 
-# To handle conversions of date time fields
-# They cannot be directly converted to json
-def handle_data(user):
-    user['created_at'] = str(user['created_at'])
-    user['updated_at'] = str(user['updated_at'])
-    
-    return user
-
-
-
 @users.route('/users')
 class Users(MethodView):
 
     @users.arguments(UserSchema)
     def get(self, request_data):
+        # response_data = []
     # for specific user
-        response_data = []
         page_size = int(request.args.get('perPage', 10))
         page_number = int(request.args.get('page', 1))
 
@@ -33,29 +23,32 @@ class Users(MethodView):
         skip_count = (page_number - 1) * page_size
         print(request_data)
         # Apply pagination to the query
-        query = User.objects(**request_data).skip(skip_count).limit(page_size)
+        username = request_data.get('username', None)
+        if username:
+            query = User.objects(username = username)
+        else:
+            query = User.objects(**request_data).skip(skip_count).limit(page_size)
 
         # Retrieve the paginated documents
         data = query.all()
         total_count = query.count()
         if data:
-            data = [item.to_mongo().to_dict() for item in data]
-            for user in data:
-                user = handle_data(user)
-                response_data.append(user)
+            metadata = {
+                "total": total_count,
+                "page": page_number,
+                "perPage": page_size
+            }
+            return APIResponse.respond(data, "Success", status_code=200, metadata=metadata)
         else:
             return APIResponse.respond(None, "Resource not found!", 404)
-        
-        message = "Successful"
 
-        return APIResponse.respond(response_data, message, status_code=200, total_count=total_count, page=page_number, perPage=page_size)
 
     @users.arguments(UserSchema)
     def put(self, request_data):
         response_data = []
 
         if 'username' not in request_data:
-            return APIResponse.respond(id, "Please provide username!", 400)
+            return APIResponse.respond(None, "Please provide username!", 400)
         
         # Remove id if exists
         request_data.pop('_id', None)
@@ -66,9 +59,9 @@ class Users(MethodView):
             user.update(**request_data)
             user.updated_at = datetime.now()
             user.save()
-            data = user.to_mongo().to_dict()
-            response_data.append(handle_data(data))
-            return APIResponse.respond(response_data, "User data updated Successfully!", 201)
+            user = User.objects(username = username).first()
+
+            return APIResponse.respond(user, "User data updated Successfully!", 201)
         else:
             return APIResponse.respond(None, "Resource not found", 404)
 
@@ -84,26 +77,23 @@ class Users(MethodView):
         #     multiple_users = [request_data]
 
         # for user in multiple_users:
-        user = User(username = request_data.get('username'))
-        if user:
+        if 'username' not in request_data:
+            return APIResponse.respond(None, "Please provide username!", 400)
+
+        username = request_data.pop('username')
+        existing_user = User.objects(username = username).first()
+        if existing_user:
             return APIResponse.respond(None, "Username already exists!", 400)
 
+        user = User(**request_data)
         user["_id"] = uuid4().hex
-        user = User(**user)
+        user["username"] = username
         user.updated_at = datetime.now()
         user.created_at = datetime.now()
         user.save()
-        user = user.to_mongo().to_dict()
-        response_data.append(handle_data(user))
 
-        if len(response_data) > 1:
-            message = f"{len(response_data)} users created successfully!"
-        else:
-            message = "User created successfully!"
 
-        status_code = 201
-
-        return APIResponse.respond(response_data, message, status_code)
+        return APIResponse.respond(user, "User created successfully!", 201)
 
 
     @users.arguments(UserSchema)
