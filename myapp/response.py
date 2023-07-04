@@ -2,7 +2,7 @@ from flask import jsonify, make_response
 import json
 class APIResponse:
     @staticmethod
-    def respond(data, message, status_code=200):
+    def respond(data, message, status_code=200, total_count=None, page=None, perPage=None):
         # processed_data = {}
         # if data is not None:
         #     if isinstance(data, dict):
@@ -16,6 +16,11 @@ class APIResponse:
         response = {
             'status': status_code,
             'message': message,
+            "metadata": {
+                "total": total_count,
+                "page": page,
+                "perPage": perPage
+            },
             'data': data
         }
         

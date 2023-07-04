@@ -26,7 +26,18 @@ class Users(MethodView):
     def get(self, request_data):
     # for specific user
         response_data = []
-        data = User.objects(**request_data).all()
+        page_size = int(request.args.get('perPage', 10))
+        page_number = int(request.args.get('page', 1))
+
+        # Calculate the number of documents to skip based on the page size and number
+        skip_count = (page_number - 1) * page_size
+        print(request_data)
+        # Apply pagination to the query
+        query = User.objects(**request_data).skip(skip_count).limit(page_size)
+
+        # Retrieve the paginated documents
+        data = query.all()
+        total_count = query.count()
         if data:
             data = [item.to_mongo().to_dict() for item in data]
             for user in data:
@@ -37,7 +48,7 @@ class Users(MethodView):
         
         message = "Successful"
 
-        return APIResponse.respond(response_data, message, 200)
+        return APIResponse.respond(response_data, message, status_code=200, total_count=total_count, page=page_number, perPage=page_size)
 
     @users.arguments(UserSchema)
     def put(self, request_data):
