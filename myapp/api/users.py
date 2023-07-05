@@ -3,85 +3,109 @@ from myapp.model.models import User
 from flask.views import MethodView
 from flask_smorest import Blueprint
 from myapp.response import APIResponse
-from myapp.data_schema.schema import *
+from myapp.data_schema.schema import UserSchema
 from uuid import uuid4
+from datetime import datetime
 
 users = Blueprint("users", __name__, description="User Operations")
 
 @users.route('/users')
 class Users(MethodView):
-    
-    def get(self):
-        # for specific user
-        if 'id' in request.args:
-            id = request.args.get('id')
-            data = User.get_user(id)
-            if data:
-                data = data.to_mongo().to_dict()
-            else:
-                return APIResponse.respond(None, "Resource not found!", 404)
-        
-        # For all users
+
+    @users.arguments(UserSchema)
+    def get(self, request_data):
+        # response_data = []
+    # for specific user
+        page_size = int(request.args.get('perPage', 10))
+        page_number = int(request.args.get('page', 1))
+
+        # Calculate the number of documents to skip based on the page size and number
+        skip_count = (page_number - 1) * page_size
+        print(request_data)
+        # Apply pagination to the query
+        username = request_data.get('username', None)
+        if username:
+            query = User.objects(username = username)
         else:
-            data = User.get_users()
-            if data:
-                data = [item.to_mongo().to_dict() for item in data]
-            else:
-                return APIResponse.respond(None, "No Data found!", 404)
-        
-        message = "Successful"
-        status_code = 200
+            query = User.objects(**request_data).skip(skip_count).limit(page_size)
 
-        return APIResponse.respond(data, message, status_code)
-
-
-    def put(self):
-        if 'id' in request.args:
-            id = request.args.get('id')
+        # Retrieve the paginated documents
+        data = query.all()
+        total_count = query.count()
+        if data:
+            metadata = {
+                "total": total_count,
+                "page": page_number,
+                "perPage": page_size
+            }
+            return APIResponse.respond(data, "Success", status_code=200, metadata=metadata)
         else:
-            return APIResponse.respond(None, "Please provide Id!", 403)
-        
-        request_data = request.get_json()
-        user = User.get_user(id)
-        for key, value in request_data.items():
-            if hasattr(user, key):
-                setattr(user, key, value)
-        
-        user.save()
-        data = user.to_mongo().to_dict()
-        return APIResponse.respond(data, "User data updated Successfully!", 200)
+            return APIResponse.respond(None, "Resource not found!", 404)
 
 
     @users.arguments(UserSchema)
-    def post(self, request_data):
-        default_value = None
-        user_data = {
-             "_id": uuid4().hex,
-            "first_name": request_data.get("first_name"),
-            "last_name": request_data.get("last_name", default_value),
-            "age": request_data.get("age", default_value),
-            "gender": request_data.get("gender", default_value),
-            "mobile": request_data.get("mobile", default_value),
-            "email": request_data.get("email", default_value),
-            "passport": request_data.get("passport", default_value),
-            "aadhar": request_data.get("aadhar", default_value),
-            "pancard": request_data.get("pancard", default_value),
-            "access_level": request_data.get("access_level", default_value),
-            "created_at": request_data.get("created_at", default_value),
-            "created_by": request_data.get("created_by", default_value),
-            "updated_at": request_data.get("updated_at", default_value),
-            "updated_by": request_data.get("updated_by", default_value),
-            "is_deleted": 0
-        }
+    def put(self, request_data):
+        response_data = []
 
-        user = User(**user_data)
-        user.save()
-        user_id = user._id
-        user = user.to_mongo().to_dict()
-        return APIResponse.respond(user, f"{user_id} user created Successfully!", 200)
-        # return APIResponse.respond(request_data, "haha testing!", 200)
+        if 'username' not in request_data:
+            return APIResponse.respond(None, "Please provide username!", 400)
         
+        # Remove id if exists
+        request_data.pop('_id', None)
+
+        username = request_data.pop('username')
+        user = User.objects(username = username).first()
+        if user:
+            user.update(**request_data)
+            user.updated_at = datetime.now()
+            user.save()
+            user = User.objects(username = username).first()
+
+            return APIResponse.respond(user, "User data updated Successfully!", 201)
+        else:
+            return APIResponse.respond(None, "Resource not found", 404)
+
+        
+    @users.arguments(UserSchema)
+    def post(self, request_data):
+        response_data = []
+        # if isinstance(request_data, list):
+        #     # Handle multiple user data
+        #     multiple_users = request_data
+        # else:
+        #     # Handle single user data
+        #     multiple_users = [request_data]
+
+        # for user in multiple_users:
+        if 'username' not in request_data:
+            return APIResponse.respond(None, "Please provide username!", 400)
+
+        username = request_data.pop('username')
+        existing_user = User.objects(username = username).first()
+        if existing_user:
+            return APIResponse.respond(None, "Username already exists!", 400)
+
+        user = User(**request_data)
+        user["_id"] = uuid4().hex
+        user["username"] = username
+        user.updated_at = datetime.now()
+        user.created_at = datetime.now()
+        user.save()
 
 
-    def delete(self):
-        pass
+        return APIResponse.respond(user, "User created successfully!", 201)
+
+
+    @users.arguments(UserSchema)
+    def delete(self, request_data):
+        response_data = []
+
+        if 'username' not in request_data:
+            return APIResponse.respond(None, "Please provide username!", 400) 
+
+        username = request_data.pop('username')
+        deleted = User.objects(username=username).delete()
+        if deleted > 0:
+            return APIResponse.respond(None, "User deleted successfully!", 200)
+        else:
+            return APIResponse.respond(None, "Resource not found!", 404)
