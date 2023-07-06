@@ -2,6 +2,7 @@ from flask import Flask
 # from api.main import main
 from .api.users import users
 from .api.main import main
+from .api.auth import auth
 from flask_smorest import Api
 # from pymongo import MongoClient
 # from pymongo.errors import ConnectionFailure
@@ -22,6 +23,8 @@ app.debug = True
 api = Api(app)
 api.register_blueprint(users)
 api.register_blueprint(main)
+api.register_blueprint(auth)
+
 
 # app.register_blueprint(main)
 # app.config["SECRET_KEY"] = SECRET_KEY
