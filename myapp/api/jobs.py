@@ -26,7 +26,7 @@ class JobResource(MethodView):
             "extra": request_data.get("extra", default_value),
             "created_at": datetime.datetime.now(),
             "created_by": request_data.get("created_by", default_value),
-            #"expire_at": request_data.get("expire_at", default_value),
+            "expire_at": request_data.get("expire_at", default_value),
             "updated_at": datetime.datetime.now(),
             "updated_by": request_data.get("created_by", default_value),
             "is_deleted": 0
@@ -36,5 +36,4 @@ class JobResource(MethodView):
         job_id = job._id
         #job = job.to_mongo().to_dict()
         return APIResponse.respond(job, f"{job_id} Job created Successfully!", 200)
-    
     

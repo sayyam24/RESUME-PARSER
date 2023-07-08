@@ -123,13 +123,12 @@ class Job(Document):
     education = ListField(StringField())
     skill = ListField(StringField())
     experience = StringField()
-    language = ListField(StringField())
-    
+    language = ListField(StringField()) 
     extra = ListField(StringField())
+    expire_at = StringField()
     # Creation info
     created_at = DateTimeField()
     created_by = StringField()
     updated_at = DateTimeField()
     updated_by = StringField()
-    expire_at = DateTimeField()
     is_deleted = IntField()
