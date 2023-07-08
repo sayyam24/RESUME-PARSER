@@ -3,10 +3,12 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
 from flask_smorest import Blueprint
 from datetime import datetime, timedelta
-from myapp.model.models import User
+from myapp.model.models import User, Authorization
 from myapp.data_schema.schema import *
 from myapp.response import APIResponse
 from uuid import uuid4
+from datetime import datetime, timedelta
+import json
 
 
 auth = Blueprint('auth', __name__)
@@ -18,7 +20,7 @@ def login():
     username = request_data.get('username', None)
     password = request_data.get('password', None)
     if username and password:
-        query = User.objects(username = username)
+        # query = User.objects(username = username)
         # username = request_data['username']
         # password = request_data['password']
         user = User.objects(username=username).first()
@@ -33,7 +35,23 @@ def login():
             SECRET_KEY,
             algorithm='HS256'
         )
-        metadata = {'token': token}
+        
+         # Save the Authorization instance to the user
+        authorization = Authorization (
+            token = token,
+            token_created_at = datetime.utcnow(),
+            token_expires_at = datetime.utcnow() + timedelta(hours=TOKEN_EXPIRATION_HOURS),
+            user=user
+        )
+        authorization.save()
+
+        metadata = {
+        'authorization': {
+        'token': token,
+        'token_created_at': authorization.token_created_at.strftime('%Y-%m-%d %H:%M:%S'),
+        'token_expires_at': authorization.token_expires_at.strftime('%Y-%m-%d %H:%M:%S')
+    }
+}
         return APIResponse.respond(user, "Success!!!!", 200, metadata=metadata)
     else:
         return APIResponse.respond(None, 'Please provide username and password', 403)
@@ -100,11 +118,34 @@ def register():
 #             return APIResponse.respond(None, 'Please provide username and password', 403)
 
 
-
 @auth.route('/logout', methods=['POST'])
 def logout():
-    # Logout logic goes here
-    # You can invalidate the token or perform any other necessary actions
+    token = request.headers.get('Authorization')  # Get the JWT token from the request headers
+    if token:
+        try:
+            decoded_token = jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
+            expiration_time = decoded_token.get('exp')
+            current_time = datetime.utcnow().timestamp()
 
-    return APIResponse.respond(None, 'Logout successful', 200)
+            if expiration_time and current_time > expiration_time:
+                # Token has already expired
+                return APIResponse.respond(None, 'Token has already expired', 401)
+
+            # Clear the token from the client-side cookies
+            response = APIResponse.respond(None, 'Logout successful', 200)
+            response.set_cookie('token', '', expires=0)
+
+            # Clear the token from the client-side local storage
+            response.headers['Clear-Token'] = 'true'
+
+            return response
+        except jwt.ExpiredSignatureError:
+            # Token is expired
+            return APIResponse.respond(None, 'Token is expired', 401)
+        except jwt.InvalidTokenError:
+            # Invalid token
+            return APIResponse.respond(None, 'Invalid token', 401)
+    else:
+        return APIResponse.respond(None, 'No token provided', 401)
+
 

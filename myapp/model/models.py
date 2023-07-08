@@ -30,6 +30,7 @@ class User(Document):
     updated_at = DateTimeField()
     updated_by = StringField()
     is_deleted = IntField()
+    
 
     @classmethod
     def get_user(cls, id=None, **kwargs):
@@ -49,8 +50,7 @@ class User(Document):
     def get_users(cls):
         user = cls.objects().all()
         return user
-
-
+   
 class Candidate(Document):
     _id = StringField(primary_key=True)
     user = StringField()
@@ -126,3 +126,16 @@ class Job(Document):
     updated_at = DateTimeField()
     updated_by = StringField()
     is_deleted = IntField()
+
+class Authorization(Document):
+    # Define fields for the Authorization collection
+    token = StringField()
+    token_created_at = DateTimeField()
+    token_expires_at = DateTimeField()
+    user = ReferenceField(User, required=True)  # Reference to the User collection
+
+    meta = {
+        'collection': 'Authorization'  
+    }
+
+     

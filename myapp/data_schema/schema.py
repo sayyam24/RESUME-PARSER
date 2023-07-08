@@ -18,6 +18,14 @@ class UserSchema(Schema):
     pancard = fields.Str()
     access_level = fields.Int()
 
+    # Authorization fields
+    authorization = fields.Nested(
+        {
+            'token': fields.Str(),
+            'token_created_at': fields.DateTime(),
+            'token_expires_at': fields.DateTime()
+        }
+    )
     # " _id" : "Demo value",
     # "username" : "Demo value",
     # "password" : "Demo value",
@@ -44,3 +52,8 @@ class UserPut(Schema):
     aadhar = fields.Str()
     pancard = fields.Str()
     access_level = fields.Int()
+
+    # Authorization fields
+    authorization_token = fields.Str()
+    authorization_created_at = fields.DateTime()
+    authorization_expires_at = fields.DateTime()
