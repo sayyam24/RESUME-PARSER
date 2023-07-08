@@ -44,3 +44,24 @@ class UserPut(Schema):
     aadhar = fields.Str()
     pancard = fields.Str()
     access_level = fields.Int()
+    
+    
+    
+    
+class JobSchema(Schema):
+    
+    
+
+    _id = fields.Str()
+    title = fields.Str()
+    recruiter = fields.Str()
+    description = fields.Str()
+    salary = fields.Str()
+    duration = fields.Str()
+    education = fields.List(fields.Str())
+    skill = fields.List(fields.Str())
+    experience = fields.Str()
+    language = fields.List(fields.Str())
+    extra = fields.List(fields.Str())
+    # created_by = fields.Str()
+    # access_level = fields.Int()
