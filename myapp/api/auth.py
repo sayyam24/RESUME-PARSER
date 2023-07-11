@@ -52,6 +52,12 @@ def login():
         'token_expires_at': authorization.token_expires_at.strftime('%Y-%m-%d %H:%M:%S')
     }
 }
+        # Update the token, token creation date, and token expiration date in the user's data
+        user.token_created_at = authorization.token_created_at
+        user.token_expires_at = authorization.token_expires_at
+        user.token = token
+        user.save()
+        
         return APIResponse.respond(user, "Success!!!!", 200, metadata=metadata)
     else:
         return APIResponse.respond(None, 'Please provide username and password', 403)

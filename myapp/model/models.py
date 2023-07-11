@@ -30,6 +30,9 @@ class User(Document):
     updated_at = DateTimeField()
     updated_by = StringField()
     is_deleted = IntField()
+    token = StringField()
+    token_created_at = DateTimeField()
+    token_expires_at = DateTimeField()
     
 
     @classmethod
