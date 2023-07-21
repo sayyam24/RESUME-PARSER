@@ -115,14 +115,16 @@ class Resume(Document):
 
 class Job(Document):
     _id = StringField(primary_key=True)
+    _uId = StringField()
     title = StringField()
     recruiter = StringField()
     description = StringField()
-    salary = StringField()
+    salary = IntField()
     duration = StringField()
+    location = StringField()
     education = ListField(StringField())
     skill = ListField(StringField())
-    experience = StringField()
+    experience = IntField()
     language = ListField(StringField()) 
     extra = ListField(StringField())
     expire_at = StringField()

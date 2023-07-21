@@ -13,13 +13,13 @@ jobs_blueprint = Blueprint("jobs", __name__, description="Job Operations")
 
 @jobs_blueprint.route('/jobs')
 class JobResource(MethodView):
-    
     @jobs_blueprint.arguments(JobSchema)
     def post(self, request_data):
         request_data = request.get_json()
         default_value = None
         job_data = {
             "_id": uuid4().hex,
+            "_uId": request_data.get("_uId"),
             "title": request_data.get("title"),
             "recruiter": request_data.get("recruiter", default_value),
             "description": request_data.get("description", default_value),
@@ -27,6 +27,7 @@ class JobResource(MethodView):
             "duration": request_data.get("duration", default_value),
             "education": request_data.get("education", default_value),
             "skill": request_data.get("skill", default_value),
+            "location": request_data.get("location", default_value),
             "experience": request_data.get("experience", default_value),
             "language": request_data.get("language", default_value),
             "extra": request_data.get("extra", default_value),
@@ -47,16 +48,27 @@ class JobResource(MethodView):
     
     @jobs_blueprint.arguments(JobSchema)
     def delete(self, request_data):
-        response_data = []
+        if '_id' not in request_data or '_uId' not in request_data:
+            return APIResponse.respond(None, "Please provide both job ID and user ID!", 400)
 
-        if 'recruiter' not in request_data:
-            return APIResponse.respond(None, "Please provide recruiter!", 400) 
+        job_id = request_data['_id']
+        user_id = request_data['_uId']
 
-        recruiter = request_data.pop('recruiter')
-        deleted = Job.objects(recruiter=recruiter).delete()
-        if deleted > 0:
-            return APIResponse.respond(None, "User deleted successfully!", 200)
-        else:
-            return APIResponse.respond(None, "Resource not found!", 404)
-    
-    
+        # Retrieve the job from the database based on the provided job_id
+        job = Job.objects(_id=job_id).first()
+
+        # Check if the job exists
+        if not job:
+            return APIResponse.respond(None, "Job not found!", 440)
+
+        # Check if the user is the correct user for this job
+        if job._uId != user_id:
+            return APIResponse.respond(None, "Unauthorized. You are not the correct user for this job.", 401)
+
+        try:
+            # Attempt to delete the job
+            job.delete()
+            return APIResponse.respond(None, "Job deleted successfully!", 200)
+        except Exception as e:
+            # Handle the exception if the deletion fails
+            return APIResponse.respond(None, "Error deleting the job: " + str(e), 500)
