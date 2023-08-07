@@ -136,6 +136,7 @@ class Authorization(Document):
     token_created_at = DateTimeField()
     token_expires_at = DateTimeField()
     user = ReferenceField(User, required=True)  # Reference to the User collection
+    username = StringField()
 
     meta = {
         'collection': 'Authorization'  

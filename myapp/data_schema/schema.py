@@ -23,7 +23,8 @@ class UserSchema(Schema):
         {
             'token': fields.Str(),
             'token_created_at': fields.DateTime(),
-            'token_expires_at': fields.DateTime()
+            'token_expires_at': fields.DateTime(),
+            'username' : fields.Str()
         }
     )
     # " _id" : "Demo value",

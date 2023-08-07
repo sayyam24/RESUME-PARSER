@@ -41,15 +41,18 @@ def login():
             token = token,
             token_created_at = datetime.utcnow(),
             token_expires_at = datetime.utcnow() + timedelta(hours=TOKEN_EXPIRATION_HOURS),
-            user=user
+            user=user,
+            username=user.username
         )
         authorization.save()
 
         metadata = {
         'authorization': {
+        'username': username,
         'token': token,
         'token_created_at': authorization.token_created_at.strftime('%Y-%m-%d %H:%M:%S'),
-        'token_expires_at': authorization.token_expires_at.strftime('%Y-%m-%d %H:%M:%S')
+        'token_expires_at': authorization.token_expires_at.strftime('%Y-%m-%d %H:%M:%S'),
+        
     }
 }
         # Update the token, token creation date, and token expiration date in the user's data
@@ -57,7 +60,7 @@ def login():
         user.token_expires_at = authorization.token_expires_at
         user.token = token
         user.save()
-        
+
         return APIResponse.respond(user, "Success!!!!", 200, metadata=metadata)
     else:
         return APIResponse.respond(None, 'Please provide username and password', 403)
@@ -123,11 +126,12 @@ def register():
 #         else:
 #             return APIResponse.respond(None, 'Please provide username and password', 403)
 
-
 @auth.route('/logout', methods=['POST'])
 def logout():
-    token = request.headers.get('Authorization')  # Get the JWT token from the request headers
-    if token:
+    token = request.headers.get('Authorization')
+    if token and token.startswith('Bearer '):
+        token = token.split('Bearer ')[1]  # Extract the token without the "Bearer " prefix
+
         try:
             decoded_token = jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
             expiration_time = decoded_token.get('exp')
@@ -153,5 +157,3 @@ def logout():
             return APIResponse.respond(None, 'Invalid token', 401)
     else:
         return APIResponse.respond(None, 'No token provided', 401)
-
-
