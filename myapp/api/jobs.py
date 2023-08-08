@@ -74,7 +74,28 @@ class JobResource(MethodView):
         else:
             return APIResponse.respond(None, "Resource not found!", 404)
 
-    
+    @jobs_blueprint.arguments(JobSchema)
+    def put(self, request_data):
+        response_data = []
+
+        if '_id' not in request_data:
+            return APIResponse.respond(None, "Please provide id!", 400)
+        
+        # Remove id if exists
+        # request_data.pop('_id', None)
+
+        id = request_data.pop('_id')
+        jobb = Job.objects(_id = id).first()
+        if jobb:
+            jobb.update(**request_data)
+            jobb.updated_at = datetime.datetime.now()
+            jobb.save()
+            jobb = Job.objects(_id = id).first()
+
+            return APIResponse.respond(jobb, "User data updated Successfully!", 201)
+        else:
+            return APIResponse.respond(None, "Resource not found", 404)
+
     @jobs_blueprint.arguments(JobSchema)
     def delete(self, request_data):
         if '_id' not in request_data or '_uId' not in request_data:
@@ -93,7 +114,6 @@ class JobResource(MethodView):
         # Check if the user is the correct user for this job
         if job._uId != user_id:
             return APIResponse.respond(None, "Unauthorized. You are not the correct user for this job.", 401)
-
         try:
             # Attempt to delete the job
             job.delete()
