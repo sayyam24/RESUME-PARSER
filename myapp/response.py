@@ -13,12 +13,18 @@ class APIResponse:
                 # Converting date time to string for json dump
                 item['created_at'] = str(item['created_at'])
                 item['updated_at'] = str(item['updated_at'])
+                item['password'] = item['password']
+                item['token_created_at'] = str(item.get('token_created_at', '')) 
+                item['token_expires_at'] = str(item.get('token_expires_at', ''))
                 data.append(item)
         else:
             records = records.to_mongo().to_dict()
             # Converting date time to string for json dump
             records['created_at'] = str(records['created_at'])
             records['updated_at'] = str(records['updated_at'])
+            records['password'] = records['password']
+            records['token_created_at'] = str(records.get('token_created_at', ''))  
+            records['token_expires_at'] = str(records.get('token_expires_at', ''))
             data.append(records)
 
         return data

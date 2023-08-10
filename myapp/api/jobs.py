@@ -41,27 +41,22 @@ class JobResource(MethodView):
         job = Job(**job_data)
         job.save()
         job_id = job._id
-        #job = job.to_mongo().to_dict()
         return APIResponse.respond(job, f"{job_id} Job created Successfully!", 200)
     
     @jobs_blueprint.arguments(JobSchema)
     def get(self, request_data):
-        # response_data = []
-    # for specific user
         page_size = int(request.args.get('perPage', 10))
         page_number = int(request.args.get('page', 1))
 
-        # Calculate the number of documents to skip based on the page size and number
         skip_count = (page_number - 1) * page_size
         print(request_data)
-        # Apply pagination to the query
+     
         username = request_data.get('username', None)
         if username:
             query = Job.objects(username = username)
         else:
             query = Job.objects(**request_data).skip(skip_count).limit(page_size)
 
-        # Retrieve the paginated documents
         data = query.all()
         total_count = query.count()
         if data:
@@ -81,9 +76,6 @@ class JobResource(MethodView):
         if '_id' not in request_data:
             return APIResponse.respond(None, "Please provide id!", 400)
         
-        # Remove id if exists
-        # request_data.pop('_id', None)
-
         id = request_data.pop('_id')
         jobb = Job.objects(_id = id).first()
         if jobb:
