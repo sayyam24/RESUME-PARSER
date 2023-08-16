@@ -1,8 +1,9 @@
 from flask import jsonify, make_response
 from mongoengine import QuerySet
 import json
-class APIResponse:
 
+class APIResponse:
+    
     @staticmethod
     def parse_data(records):
         data = []

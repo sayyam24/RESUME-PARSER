@@ -53,8 +53,32 @@ class UserPut(Schema):
     aadhar = fields.Str()
     pancard = fields.Str()
     access_level = fields.Int()
+<<<<<<< HEAD
+    
+    
+    
+    
+class JobSchema(Schema):
+    _id = fields.Str()
+    _uId = fields.Str()
+    title = fields.Str()
+    recruiter = fields.Str()
+    description = fields.Str()
+    salary = fields.Int()
+    duration = fields.Str()
+    education = fields.List(fields.Str())
+    skill = fields.List(fields.Str())
+    experience = fields.Int()
+    expire_at = fields.Str()
+    location = fields.Str()
+    language = fields.List(fields.Str())
+    extra = fields.List(fields.Str())
+    created_by = fields.Str()
+    access_level = fields.Int()
+=======
 
     # Authorization fields
     authorization_token = fields.Str()
     authorization_created_at = fields.DateTime()
     authorization_expires_at = fields.DateTime()
+>>>>>>> 0dd22ccf8bf2fb1f95cf9fbb8d9d44e30a31e1cd

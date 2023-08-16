@@ -36,6 +36,11 @@ class User(Document):
     
 
     @classmethod
+    def get_user(cls, id):
+        
+        # Fetch the user based on the query
+        user = cls.objects(_id = id).first()
+
     def get_user(cls, id=None, **kwargs):
         query = {}
 
@@ -113,16 +118,19 @@ class Resume(Document):
 
 class Job(Document):
     _id = StringField(primary_key=True)
+    _uId = StringField()
     title = StringField()
     recruiter = StringField()
     description = StringField()
-    salary = StringField()
+    salary = IntField()
     duration = StringField()
+    location = StringField()
     education = ListField(StringField())
     skill = ListField(StringField())
-    experience = ListField(StringField())
-    language = ListField(StringField())
+    experience = IntField()
+    language = ListField(StringField()) 
     extra = ListField(StringField())
+    expire_at = StringField()
     # Creation info
     created_at = DateTimeField()
     created_by = StringField()
