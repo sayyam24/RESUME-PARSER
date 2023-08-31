@@ -3,7 +3,7 @@ from myapp.model.models import Job
 from flask.views import MethodView
 from flask_smorest import Blueprint
 from myapp.data_schema.schema import JobSchema
-from myapp.response import APIResponse
+from myapp.response import APIResponseJob
 from myapp.data_schema.schema import *
 from uuid import uuid4
 import datetime
@@ -41,7 +41,7 @@ class JobResource(MethodView):
         job = Job(**job_data)
         job.save()
         job_id = job._id
-        return APIResponse.respond(job, f"{job_id} Job created Successfully!", 200)
+        return APIResponseJob.respond(job, f"{job_id} Job created Successfully!", 200)
     
     @jobs_blueprint.arguments(JobSchema)
     def get(self, request_data):
@@ -65,16 +65,16 @@ class JobResource(MethodView):
                 "page": page_number,
                 "perPage": page_size
             }
-            return APIResponse.respond(data, "Success", status_code=200, metadata=metadata)
+            return APIResponseJob.respond(data, "Success", status_code=200, metadata=metadata)
         else:
-            return APIResponse.respond(None, "Resource not found!", 404)
+            return APIResponseJob.respond(None, "Resource not found!", 404)
 
     @jobs_blueprint.arguments(JobSchema)
     def put(self, request_data):
         response_data = []
 
         if '_id' not in request_data:
-            return APIResponse.respond(None, "Please provide id!", 400)
+            return APIResponseJob.respond(None, "Please provide id!", 400)
         
         id = request_data.pop('_id')
         jobb = Job.objects(_id = id).first()
@@ -84,14 +84,14 @@ class JobResource(MethodView):
             jobb.save()
             jobb = Job.objects(_id = id).first()
 
-            return APIResponse.respond(jobb, "User data updated Successfully!", 201)
+            return APIResponseJob.respond(jobb, "User data updated Successfully!", 201)
         else:
-            return APIResponse.respond(None, "Resource not found", 404)
+            return APIResponseJob.respond(None, "Resource not found", 404)
 
     @jobs_blueprint.arguments(JobSchema)
     def delete(self, request_data):
         if '_id' not in request_data or '_uId' not in request_data:
-            return APIResponse.respond(None, "Please provide both job ID and user ID!", 400)
+            return APIResponseJob.respond(None, "Please provide both job ID and user ID!", 400)
 
         job_id = request_data['_id']
         user_id = request_data['_uId']
@@ -101,15 +101,15 @@ class JobResource(MethodView):
 
         # Check if the job exists
         if not job:
-            return APIResponse.respond(None, "Job not found!", 440)
+            return APIResponseJob.respond(None, "Job not found!", 440)
 
         # Check if the user is the correct user for this job
         if job._uId != user_id:
-            return APIResponse.respond(None, "Unauthorized. You are not the correct user for this job.", 401)
+            return APIResponseJob.respond(None, "Unauthorized. You are not the correct user for this job.", 401)
         try:
             # Attempt to delete the job
             job.delete()
-            return APIResponse.respond(None, "Job deleted successfully!", 200)
+            return APIResponseJob.respond(None, "Job deleted successfully!", 200)
         except Exception as e:
             # Handle the exception if the deletion fails
-            return APIResponse.respond(None, "Error deleting the job: " + str(e), 500)
+            return APIResponseJob.respond(None, "Error deleting the job: " + str(e), 500)
