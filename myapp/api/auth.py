@@ -8,6 +8,11 @@ from myapp.data_schema.schema import *
 from myapp.response import APIResponse
 from uuid import uuid4
 from datetime import datetime, timedelta
+import random
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+import smtplib
+import ssl
 import json
 
 
@@ -63,15 +68,15 @@ def login():
         return APIResponse.respond(None, 'Please provide username and password', 403)
 
 
-@auth.route('/register', methods=['GET', 'POST'])
+@auth.route('/register', methods=['POST'])
 def register():
     request_data = request.get_json()
     username = request_data.get('username', None)
     password = request_data.get('password', None)
-    response_data = []
-    
-    if 'username' not in request_data or 'password' not in request_data:
-        return APIResponse.respond(None, "Please provide username and password", 400)
+    email = request_data.get('email', None)
+
+    if 'username' not in request_data or 'password' not in request_data or 'email' not in request_data:
+        return APIResponse.respond(None, "Please provide username, password, and email", 400)
 
     username = request_data.pop('username')
     existing_user = User.objects(username=username).first()
@@ -80,40 +85,62 @@ def register():
 
     # Hash the password
     hashed_password = generate_password_hash(password)
-    
+
     user = User(**request_data)
     user["_id"] = uuid4().hex
     user["username"] = username
-    user["password"] = hashed_password  # Store the hashed password
+    user["password"] = hashed_password
     user.updated_at = datetime.now()
     user.created_at = datetime.now()
     user.save()
 
-    return APIResponse.respond(user, "User created successfully!", 201)
+    # Send OTP to the provided email address
+    otp = sendOTP(email)
 
-# def register():
-#         request_data = request.get_json()
-#         username = request_data.get('username', None)
-#         password = request_data.get('password', None)
-#         response_data = []
-#         # for user in multiple_users:
-#         if 'username' not in request_data:
-#             return APIResponse.respond(None, "Please provide username!", 400)
-
-#         username = request_data.pop('username')
-#         existing_user = User.objects(username = username).first()
-#         if existing_user:
-#             return APIResponse.respond(None, "Username already exists!", 400)
-
-#         user = User(**request_data)
-#         user["_id"] = uuid4().hex
-#         user["username"] = username
-#         user.updated_at = datetime.now()
-#         user.created_at = datetime.now()
-#         user.save()
+    return APIResponse.respond(user, "User created successfully! OTP sent to the provided email.", 201)
 
 
-#         return APIResponse.respond(user, "User created successfully!", 201)
+def sendOTP(email):
+    otp = random.randrange(100000, 999999)
+
+    sender_email = 'your_sender_email@example.com'  # Replace with your sender email
+    sender_password = 'your_email_password'  # Replace with your sender email password
+    receiver_email = email
+
+    message = MIMEMultipart("alternative")
+    message["Subject"] = "PixelStat ERP : OTP (One Time Password)"
+    message["From"] = sender_email
+    message["To"] = receiver_email
+
+    text = f"Verify your email address to login ERP. OTP: {otp}"
+    html = f"""
+    <html>
+    <body>
+        <h3>Verify your login using OTP</h3>
+        <br>
+        <h3>OTP: {otp}</h3>
+    </body>
+    </html>
+    """
+
+    part1 = MIMEText(text, "plain")
+    part2 = MIMEText(html, "html")
+
+    message.attach(part1)
+    message.attach(part2)
+
+    try:
+        context = ssl.create_default_context()
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
+            server.login(sender_email, sender_password)
+            server.sendmail(sender_email, receiver_email, message.as_string())
+        print("OTP email sent successfully!")
+    except Exception as e:
+        print(f"An error occurred while sending the OTP email: {e}")
+
+    return otp
+
+
    
 
 @auth.route('/logout', methods=['POST'])
