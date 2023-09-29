@@ -14,9 +14,11 @@ from email.mime.text import MIMEText
 import smtplib
 import ssl
 import json
+from flask_cors import CORS
 
 
 auth = Blueprint('auth', __name__)
+CORS(auth)
 SECRET_KEY = "903b7e26c34f4f042f80e7532544f47973814101"
 TOKEN_EXPIRATION_HOURS = 24
 @auth.route('/login', methods=['POST'])

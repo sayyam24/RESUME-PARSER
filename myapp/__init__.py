@@ -5,6 +5,7 @@ from .api.main import main
 from .api.jobs import jobs_blueprint
 from .api.auth import auth
 from flask_smorest import Api
+from flask_cors import CORS
 # from pymongo import MongoClient
 # from pymongo.errors import ConnectionFailure
 # from dotenv import load_dotenv, find_dotenv
@@ -18,6 +19,7 @@ from flask_smorest import Api
 # def create_app(config_object='myapp.settings'):
 config_object='myapp.settings'
 app = Flask(__name__)
+CORS(app)
 
 app.config.from_object(config_object)
 app.debug = True

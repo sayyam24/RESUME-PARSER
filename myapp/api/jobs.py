@@ -7,9 +7,10 @@ from myapp.response import APIResponseJob
 from myapp.data_schema.schema import *
 from uuid import uuid4
 import datetime
-
+from flask_cors import CORS
 
 jobs_blueprint = Blueprint("jobs", __name__, description="Job Operations")
+CORS(jobs_blueprint)
 
 @jobs_blueprint.route('/jobs')
 class JobResource(MethodView):
@@ -113,3 +114,13 @@ class JobResource(MethodView):
         except Exception as e:
             # Handle the exception if the deletion fails
             return APIResponseJob.respond(None, "Error deleting the job: " + str(e), 500)
+        
+    # @jobs_blueprint.route('/jobs/<string:job_id>', methods=['GET'])
+    # def get_job_details(job_id):
+    #     # Fetch job details based on the provided job_id
+    #     job = Job.objects(id=job_id).first()
+
+    #     if job:
+    #         return APIResponseJob.respond(job.to_dict(), "Success", status_code=200)
+    #     else:
+    #         return APIResponseJob.respond(None, "Job not found!", 404)

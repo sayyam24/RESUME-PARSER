@@ -6,8 +6,10 @@ from myapp.response import APIResponse
 from myapp.data_schema.schema import UserSchema
 from uuid import uuid4
 from datetime import datetime
+from flask_cors import CORS
 
 users = Blueprint("users", __name__, description="User Operations")
+CORS(users)
 
 @users.route('/users')
 class Users(MethodView):

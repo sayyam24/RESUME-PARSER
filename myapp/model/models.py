@@ -1,4 +1,4 @@
-import os
+# import os
 from mongoengine import *
 
 connect('sip')
@@ -18,6 +18,8 @@ class User(Document):
     gender = StringField()
     mobile = StringField()
     email = StringField()
+    company_name=StringField()
+    role=StringField()
     # Password for authentication
     password = StringField()
     passport = StringField()
