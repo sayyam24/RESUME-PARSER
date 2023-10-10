@@ -111,6 +111,7 @@ class Resume(Document):
     socialwork = ListField(StringField())
     extra = ListField(StringField())
     job = StringField()
+    path = StringField()
     # Creation info
     created_at = DateTimeField()
     created_by = StringField()

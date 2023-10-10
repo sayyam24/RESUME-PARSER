@@ -1,0 +1,15 @@
+Web Developer
+We are looking for a talented Full Stack Web Developer to join our dynamic team. The ideal candidate will have a strong foundation in both front-end and back-end development, with a passion for creating responsive and user-friendly web applications. 
+- Collaborate with the design team to implement user-friendly interfaces using HTML, CSS, and JavaScript (React, Angular, or Vue.js).
+- Develop robust server-side logic using Node.js, Express.js, and databases like MongoDB or MySQL. 
+- Write clean, efficient, and maintainable code following industry best practices. 
+- Ensure the responsiveness and cross-browser compatibility of web applications. 
+- Collaborate with the DevOps team to deploy applications using Docker and Kubernetes. 
+- Integrate RESTful APIs and GraphQL to fetch and update data efficiently. 
+- Optimize application performance, troubleshoot issues, and perform debugging. 
+- Participate in code reviews and provide constructive feedback to team members.
+Education requirements : BTech, MTech
+Skills must have : HTML, CSS, Javascript, Problem-solving, react/angular/vue.js, databases like mongodb, mysql, GraphQL, Debugging, Strong collaboration and communication abilities
+Language known English, Hindi, Marathi
+Good to have skills : While we value candidates who match our requirements closely, we also encourage those with a strong foundation in these technologies and a willingness to learn to apply. 
+If you're passionate about building innovative web applications and contributing to a collaborative team, we'd love to hear from you!

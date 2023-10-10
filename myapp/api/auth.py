@@ -3,7 +3,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
 from flask_smorest import Blueprint
 from datetime import datetime, timedelta
-from myapp.model.models import User, Authorization
+from myapp.model.models import Job, User, Authorization
 from myapp.data_schema.schema import *
 from myapp.response import APIResponse
 from uuid import uuid4
@@ -15,12 +15,53 @@ import smtplib
 import ssl
 import json
 from flask_cors import CORS
-
+from flask_cors import cross_origin
 
 auth = Blueprint('auth', __name__)
 CORS(auth)
 SECRET_KEY = "903b7e26c34f4f042f80e7532544f47973814101"
 TOKEN_EXPIRATION_HOURS = 24
+
+from flask import Flask, request, jsonify
+import os
+from flask_smorest import Blueprint
+from myapp.model.models import Resume
+from myapp.data_schema.schema import *
+from myapp.response import APIResponse
+from flask_cors import CORS
+from res.ranking_model import ranking
+
+
+# ranks = Blueprint("ranks",__name__)
+# CORS(ranks)
+
+@auth.route('/rank/<id>', methods=['GET'])
+@cross_origin()
+def rank(id):
+    print("hii")
+    job = Job.objects(_id=id).first()
+    job_desc = job['title'] + '\n' + job['description'] + '\n' + 'Education requirements : ' + ', '.join(job['education']) + '\n' + 'Skills must have : ' + ', '.join(job['skill']) + '\n' + 'Language known ' + ', '.join(job['language']) + '\n' + 'Good to have skills : ' + ', '.join(job['extra'])
+    count_candidates = request.args.get('count', default=10, type=int)
+    print(count_candidates)
+    resume_data_path = 'C:/Users/prajv/OneDrive/Desktop/SIP/recruitment-automation-system/recruitment-automation-system/myappRes_data.csv'
+
+    job_description_path = r"C:\Users\prajv\OneDrive\Desktop\SIP\recruitment-automation-system\recruitment-automation-system\res\JD_fullstack.txt"
+    # RankingModel = ranking.RankingModel()
+    
+    with open(job_description_path, "w", encoding='utf-8') as existing_file:
+        existing_file.write(job_desc)
+    
+    ranking_model = ranking.RankingModel(resume_data_path, job_description_path, count_candidates)
+    ranking_model.preprocess_degrees()
+    ranking_model.preprocess_experience()
+    ranking_model.preprocess_resume_text()
+    ranking_model.rank_resumes()
+    print(ranking_model.top_10_resumes)
+    top_10_resumes_list = ranking_model.top_10_resumes.to_dict(orient='records')
+
+    return jsonify({'message': 'Ranking Data', 'data': top_10_resumes_list}), 200
+ 
+
 @auth.route('/login', methods=['POST'])
 def login():
     request_data = request.get_json()

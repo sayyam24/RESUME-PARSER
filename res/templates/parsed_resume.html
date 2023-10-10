@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Parsed Resume Details</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>Parsed Resume Details</h1>
+    <ul>
+        <li><strong>Name:</strong> {{ parsed_details['name'] }}</li>
+        <li><strong>Email:</strong> {{ parsed_details['email'] }}</li>
+        <li><strong>Mobile Number:</strong> {{ parsed_details['mobile_number'] }}</li>
+        <li><strong>Skills:</strong> {{ parsed_details['skills'] }}</li>
+        <li><strong>Education:</strong> {{ parsed_details['education'] }}</li>
+    </ul>
+</body>
+</html>

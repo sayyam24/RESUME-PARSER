@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Resume Rankings</title>
+</head>
+<body>
+    <h1>Top 10 Resume Rankings</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Rank</th>
+                <th>Name</th>
+                <th>Resume Score (%)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for resume in top_10_resumes %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ resume.Name }}</td>
+                    <td>{{ resume['resume_score(%)'] }}</td>  <!-- Use square brackets to access the variable with special characters -->
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
