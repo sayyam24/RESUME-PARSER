@@ -7,13 +7,12 @@ const UploadResume: React.FC = () => {
   const [isFileSelected, setIsFileSelected] = useState<boolean>(false);
   const [isTextSelected, setIsTextSelected] = useState<boolean>(false);
   const [isTermsAccepted, setIsTermsAccepted] = useState<boolean>(false);
+  const [parsedData, setParsedData] = useState<any>(null);
 
   const handleTextChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     const text = event.target.value;
-    if (text === "") {
-      setIsTextSelected(false);
-    } else setIsTextSelected(true);
     setCopiedText(text);
+    setIsTextSelected(text !== "");
   };
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -21,7 +20,6 @@ const UploadResume: React.FC = () => {
     if (file) {
       setSelectedFile(file);
       setIsFileSelected(true);
-      //   setIsTextSelected(false);
     } else {
       setIsFileSelected(false);
     }
@@ -46,7 +44,7 @@ const UploadResume: React.FC = () => {
       return;
     }
 
-    if (!isFileSelected && !isTextSelected && isTermsAccepted) {
+    if (!isFileSelected && !isTextSelected) {
       window.alert("Please select either a file or enter text.");
       return;
     }
@@ -67,13 +65,20 @@ const UploadResume: React.FC = () => {
           },
         });
 
-        const result = response.data.result;
-        console.log(result);
+        setParsedData(response.data);
       } catch (error) {
         console.error("Error:", error);
       }
     } else if (isTextSelected) {
-      console.log(copiedText);
+      try {
+        const response = await axios.post("http://127.0.0.1:5000/upload_text", {
+          text: copiedText,
+        });
+
+        setParsedData(response.data);
+      } catch (error) {
+        console.error("Error:", error);
+      }
     }
   };
 
@@ -82,6 +87,7 @@ const UploadResume: React.FC = () => {
     setCopiedText("");
     setIsFileSelected(false);
     setIsTextSelected(false);
+    setParsedData(null);
   };
 
   return (
@@ -139,7 +145,7 @@ const UploadResume: React.FC = () => {
           </div>
           <div className="flex justify-end">
             <button
-              className="mt-4 bg-transparent text-gray-700 font-semibold  hover:text-gray-400"
+              className="mt-4 bg-transparent text-gray-700 font-semibold hover:text-gray-400"
               onClick={handleClear}
             >
               Clear
@@ -172,6 +178,12 @@ const UploadResume: React.FC = () => {
             <p className="text-red-500 mt-4 text-center">
               Please select either a file or enter text, not both.
             </p>
+          )}
+          {parsedData && (
+            <div className="mt-8">
+              <h2 className="text-xl font-semibold mb-4">Parsed Details</h2>
+              <pre>{JSON.stringify(parsedData, null, 2)}</pre>
+            </div>
           )}
         </form>
       </div>

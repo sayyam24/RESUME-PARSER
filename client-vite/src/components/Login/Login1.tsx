@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-// import Navbar from "../Navbar/Navbar";
-// import Navbar1 from "../Navbar/Navbar1";
+
 interface LoginPageProps {
-  onLogin: () => void; // Define the prop type for the callback function
+  onLogin: () => void;
 }
+
 const Login: React.FC<LoginPageProps> = ({ onLogin }) => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
@@ -13,8 +13,8 @@ const Login: React.FC<LoginPageProps> = ({ onLogin }) => {
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [focusedField, setFocusedField] = useState("");
-  // const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+
   const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target;
     setEmail(value);
@@ -36,23 +36,20 @@ const Login: React.FC<LoginPageProps> = ({ onLogin }) => {
 
     try {
       const response = await axios.post("http://localhost:5000/login", {
-        username: email,
-        password: password,
+        email: email,  // Ensure 'email' key is used here
+        password: password,  // Ensure 'password' key is used here
       });
-      // Handle success response, e.g., store user token, redirect, etc.
+
       if (response.data.status === 200) {
         console.log("Login successful:", response.data);
-        // setIsLoggedIn(true);
         localStorage.setItem("isLoggedIn", "true");
         onLogin();
         navigate("/");
       } else {
         console.log("Login failed. Status:", response.data.message);
-        // window.alert(response.data.message);
         setErrorMessage(response.data.message);
       }
     } catch (error: any) {
-      // Handle error response
       if (error.response) {
         setErrorMessage(error.response.data.message);
       } else {
@@ -60,6 +57,7 @@ const Login: React.FC<LoginPageProps> = ({ onLogin }) => {
       }
     }
   };
+
   const closeAlert = () => {
     setErrorMessage("");
   };
@@ -81,9 +79,7 @@ const Login: React.FC<LoginPageProps> = ({ onLogin }) => {
       return "Password is required";
     }
 
-    if (
-      !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()]).{8,}$/.test(password)
-    ) {
+    if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()]).{8,}$/.test(password)) {
       return "Invalid password format";
     }
 
@@ -92,7 +88,6 @@ const Login: React.FC<LoginPageProps> = ({ onLogin }) => {
 
   return (
     <div>
-      {/* {isLoggedIn ? <Navbar1 /> : <Navbar />} */}
       <div className="flex justify-center items-center h-screen">
         <div className="w-1/3 bg-white rounded-lg shadow-lg p-6">
           <form onSubmit={handleLogin}>
